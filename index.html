@@ -1,4 +1,19 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Zeus AI Accelerator: add AI to any Salesforce record by writing a question. Built by Rahul Ravipudi."><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Zeus AI Accelerator: add AI to any Salesforce record by writing a question. Built by Rahul Ravipudi."><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}
+/* Contact card: one fixed navy look in both themes */
+.contact{margin-top:56px;background:#0C1A2D;color:#F4F6FA;border:1px solid #22324F;border-radius:14px;padding:clamp(24px,5vw,48px);display:flex;flex-direction:column;gap:14px}
+.contact .eyebrow{color:#F4B90A}
+.contact h2{color:#F4F6FA;margin:0;font-size:clamp(1.9rem,4.4vw,3rem);line-height:1.05;letter-spacing:-.02em}
+.contact .lede{color:#B3BFD3;font-size:1.05rem;max-width:56ch;margin:0}
+.contact .lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.contact .line{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px}
+.contact .label{width:4.5rem;font:600 .75rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:#B3BFD3}
+.contact .sel{font-family:var(--font-mono);font-size:clamp(1rem,2.2vw,1.35rem);user-select:all;overflow-wrap:anywhere}
+.contact .copy{font:600 .8rem var(--font-body);color:#F4F6FA;background:transparent;border:1px solid #3A4C6E;border-radius:6px;padding:3px 10px;cursor:pointer}
+.contact .copy:hover{border-color:#B3BFD3}
+.contact .copy:focus-visible,.contact a:focus-visible{outline:2px solid #F4B90A;outline-offset:2px}
+.contact .also{color:#B3BFD3;margin:8px 0 0}
+.contact .also a{color:#F4B90A}
+</style></head><body>
 <title>Zeus AI Accelerator</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Caveat:wght@500;600&display=swap">
 <style>
@@ -518,12 +533,12 @@ footer{margin-top:56px;font-size:.85rem;color:var(--ink-2);max-width:80ch}
         </ul>
       </div>
       <div class="next">
-        <h3>Not done yet</h3>
+        <h3>In development</h3>
         <ul>
-          <li>Azure AI Foundry and Google Vertex AI are supported by the design but have not been run.</li>
-          <li>Not yet published as a managed package. Today it is deployed straight into each org.</li>
-          <li>Built and demonstrated in sandboxes. It has not been deployed to production.</li>
-          <li>The figures on this page come from a small demo data set.</li>
+          <li>Connectors for Azure AI Foundry and Google Vertex AI.</li>
+          <li>A Salesforce managed package for one-click install, in place of deploying into each org.</li>
+          <li>Moving from sandbox pilots to a first production rollout.</li>
+          <li>More objects beyond Cases and Leads.</li>
         </ul>
       </div>
     </div>
@@ -536,6 +551,17 @@ footer{margin-top:56px;font-size:.85rem;color:var(--ink-2);max-width:80ch}
       <p>The demos on this page are replicas, and the design behind them is left out on purpose. The real thing runs in a Salesforce org, and I am glad to walk through it live: add a question, create a Case, and watch the fields fill.</p>
     </div>
     <div class="hand sig">Rahul Ravipudi</div>
+  </section>
+
+  <section class="contact" id="contact" aria-labelledby="contact-h">
+    <div class="eyebrow">Contact me</div>
+    <h2 id="contact-h">I'm open to new roles.</h2>
+    <p class="lede">If your team builds on Salesforce or with AI, I'd like to hear from you.</p>
+    <div class="lines">
+      <div class="line"><span class="label">Email</span><span class="sel" id="email">rahul99to@gmail.com</span><button class="copy" id="copy-email" type="button">Copy</button></div>
+      <div class="line"><span class="label">Phone</span><span class="sel">+91 7416188392</span></div>
+    </div>
+    <p class="also">I also built <a href="https://rahulravipudi.github.io/holocron/">Holocron</a>, a Salesforce AI assistant that answers questions about your data in plain language.</p>
   </section>
 
   <footer>Every record, name and message shown on this page is invented sample data. No customer data appears here.</footer>
@@ -722,4 +748,15 @@ footer{margin-top:56px;font-size:.85rem;color:var(--ink-2);max-width:80ch}
 })();
 </script>
 
+<script>
+(function(){
+  var b=document.getElementById('copy-email'); if(!b) return;
+  b.addEventListener('click',function(){
+    var t=document.getElementById('email').textContent;
+    var done=function(){ b.textContent='Copied'; setTimeout(function(){ b.textContent='Copy'; },1600); };
+    var fallback=function(){ var r=document.createRange(); r.selectNodeContents(document.getElementById('email')); var x=window.getSelection(); x.removeAllRanges(); x.addRange(r); };
+    try{ navigator.clipboard.writeText(t).then(done,fallback); }catch(e){ fallback(); }
+  });
+})();
+</script>
 </body></html>
