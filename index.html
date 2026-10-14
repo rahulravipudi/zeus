@@ -1,0 +1,725 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Zeus AI Accelerator: add AI to any Salesforce record by writing a question. Built by Rahul Ravipudi."><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Zeus AI Accelerator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Caveat:wght@500;600&display=swap">
+<style>
+/* Layout: left-aligned editorial column on watercolour paper. The hero pairs the thesis with a live record card
+   struck by a painted bolt; every later section pairs a short claim with something the reader can press. */
+:root{
+  --bg:#F1F4F9; --surface:#FFFFFF; --surface-2:#E6ECF4; --ink:#0C1A2D; --ink-2:#47586F; --line:#CBD5E2;
+  --bolt:#F4B90A; --bolt-ink:#1B1400;
+  --blue:#1746C7; --on-blue:#FFFFFF; --blue-soft:#DFE8FB;
+  --good:#0B7248; --good-soft:#DDF3E8; --bad:#B3261E; --bad-soft:#FBE3E1; --warn:#8F5200; --warn-soft:#FBEBD3;
+  --shadow:0 1px 2px rgba(12,26,45,.06), 0 14px 34px -14px rgba(12,26,45,.22);
+  --font-display:'Bricolage Grotesque','Avenir Next','Segoe UI',sans-serif;
+  --font-body:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+  --font-hand:'Caveat','Bradley Hand','Segoe Print',cursive;
+  --show-l:block; --show-d:none; --blend:multiply;
+  --grain:url(art/grain.png); --brush:url(art/brush.webp);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A1422; --surface:#111F33; --surface-2:#18293F; --ink:#E8EEF7; --ink-2:#9FB0C6; --line:#27394F;
+    --bolt:#FFC933; --bolt-ink:#1B1400;
+    --blue:#8DB0FF; --on-blue:#0A1422; --blue-soft:#1A2C4D;
+    --good:#4FD19B; --good-soft:#123327; --bad:#FF8A80; --bad-soft:#3A1917; --warn:#FFB454; --warn-soft:#3A2A10;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -14px rgba(0,0,0,.7);
+    --show-l:none; --show-d:block; --blend:screen; --grain:url(art/grain-dark.png); --brush:url(art/brush.webp);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A1422; --surface:#111F33; --surface-2:#18293F; --ink:#E8EEF7; --ink-2:#9FB0C6; --line:#27394F;
+  --bolt:#FFC933; --bolt-ink:#1B1400;
+  --blue:#8DB0FF; --on-blue:#0A1422; --blue-soft:#1A2C4D;
+  --good:#4FD19B; --good-soft:#123327; --bad:#FF8A80; --bad-soft:#3A1917; --warn:#FFB454; --warn-soft:#3A2A10;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 34px -14px rgba(0,0,0,.7);
+  --show-l:none; --show-d:block; --blend:screen; --grain:url(art/grain-dark.png); --brush:url(art/brush.webp);
+  color-scheme:dark;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+body{background-color:var(--bg);background-image:var(--grain);background-size:256px 256px;background-blend-mode:var(--blend);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin-inline:auto;padding-inline:20px;padding-block:28px 72px}
+h1,h2,h3,p,dl,dd,ol,ul{margin:0}
+ol,ul{padding:0;list-style:none}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;letter-spacing:-.01em}
+a{color:var(--blue)}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:4px}
+.art{display:block;pointer-events:none;user-select:none}
+.art img{width:100%;height:auto}
+.art .l{display:var(--show-l)}
+.art .d{display:var(--show-d)}
+.hand{font-family:var(--font-hand);font-size:1.45rem;line-height:1.05;color:var(--blue);font-weight:600}
+
+/* top row */
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:1.25rem}
+.brand svg{width:22px;height:28px;flex:none}
+.brand-rest{font-weight:500;color:var(--ink-2)}
+.top nav{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:.9rem}
+.top nav a{color:var(--ink-2);text-decoration:none}
+.top nav a:hover{color:var(--ink);text-decoration:underline}
+
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:48px;align-items:start;margin-top:20px}
+.hero > *{min-width:0}
+.hero-copy{padding-top:96px}
+.kicker{font-family:var(--font-mono);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+h1{font-size:clamp(2.3rem,5.4vw,4.1rem);line-height:1.02;font-weight:750;margin-top:0}
+.mark{background:var(--brush) center/100% 100% no-repeat;color:var(--bolt-ink);padding:.02em .2em .08em;margin-inline:-.08em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.lead{font-size:1.14rem;color:var(--ink-2);max-width:54ch;margin-top:22px}
+.hero-links{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:600 .95rem var(--font-body);padding:11px 18px;border-radius:8px;border:1px solid var(--blue);background:var(--blue);color:var(--on-blue);text-decoration:none;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--blue)}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.55;cursor:default;filter:none}
+.byline{margin-top:28px;font-size:.9rem;color:var(--ink-2)}
+.byline b{color:var(--ink);font-weight:600}
+.stage{position:relative}
+.hero-art{width:86%;margin:0 auto -15px;position:relative;z-index:2}
+.stage > .hand{position:absolute;left:0;top:10px;transform:rotate(-6deg);z-index:3;max-width:8ch;text-align:center}
+
+/* record card (hero demo and the guided example share it) */
+.demo{position:relative;z-index:1;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.demo-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+.tab{font:500 .82rem var(--font-body);padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.tab[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.tab.done{color:var(--good);border-color:var(--good)}
+.tab.done[aria-pressed="true"]{color:var(--bg);border-color:var(--ink)}
+.demo-msg{padding:16px 18px;border-bottom:1px solid var(--line)}
+.demo-from{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.demo-msg p{margin-top:6px;font-size:.96rem}
+#demoText{min-height:4.6em}
+.demo-fields{display:grid;grid-template-columns:8.6rem minmax(0,1fr);gap:0;padding:6px 18px}
+.demo-fields dt,.demo-fields dd{padding:9px 0;border-bottom:1px solid var(--line);font-size:.9rem;min-width:0}
+.demo-fields dt{color:var(--ink-2)}
+.demo-fields dt:last-of-type,.demo-fields dd:last-of-type{border-bottom:0}
+.ghostbar{display:none;height:.7em;width:55%;border-radius:4px;background:var(--surface-2);vertical-align:middle}
+dd.wait .ghostbar{display:inline-block}
+dd.wait .val{display:none}
+.flash{animation:flash 1.1s ease-out}
+@keyframes flash{from{background:var(--blue-soft)}to{background:transparent}}
+.chip{display:inline-block;font:500 .8rem var(--font-body);padding:2px 10px;border-radius:999px;background:var(--surface-2);color:var(--ink)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.dim{color:var(--ink-2);font-style:italic}
+.newtag{font:500 .68rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--blue);margin-left:8px}
+.demo-foot{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px;padding:12px 18px;background:var(--surface-2);font-family:var(--font-mono);font-size:.74rem;color:var(--ink-2)}
+.note{margin-top:10px;font-size:.8rem;color:var(--ink-2);max-width:70ch}
+
+/* figures */
+.figures{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:28px;margin-top:64px}
+.figures div{border-top:2px solid var(--ink);padding-top:14px}
+.figures strong{display:block;font-family:var(--font-display);font-size:2.5rem;line-height:1;font-weight:700;font-variant-numeric:tabular-nums}
+.figures span{display:block;margin-top:8px;color:var(--ink-2);font-size:.95rem;max-width:26ch}
+.figures + .note{margin-top:22px}
+
+/* sections */
+section{margin-top:104px}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:24px 40px;align-items:end}
+.sec-head > *{min-width:0}
+.sec-head .art{justify-self:end;width:100%;max-width:300px}
+.eyebrow{font-family:var(--font-mono);font-size:.78rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+h2{font-size:clamp(1.7rem,3.4vw,2.5rem);line-height:1.08;font-weight:700;margin-top:12px;max-width:22ch}
+.sec-lead{margin-top:14px;color:var(--ink-2);font-size:1.05rem;max-width:62ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.panel h3{font-size:1.05rem;font-weight:650}
+
+/* who */
+.who{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px 32px;margin-top:36px}
+.who li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:14px;align-items:center}
+.badge{position:relative;width:64px;height:64px;display:grid;place-items:center}
+.badge .art{position:absolute;inset:-8px}
+.badge b{position:relative;font-family:var(--font-display);font-weight:700;font-size:1.05rem}
+.who h3{font-size:1.05rem;font-weight:650}
+.who p{font-size:.92rem;color:var(--ink-2);margin-top:2px}
+
+/* guided example */
+.builder{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;margin-top:40px;align-items:start}
+.builder > *{min-width:0}
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.form{display:grid;gap:14px;margin-top:16px}
+.fld span{display:block;font-weight:600;font-size:.9rem;margin-bottom:5px}
+.fld div{font-size:.95rem;background:var(--bg);border:1px solid var(--line);border-radius:7px;padding:9px 11px;min-height:2.6em}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.add-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.tally{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font:400 .82rem var(--font-mono);color:var(--ink-2)}
+.tally b{color:var(--ink)}
+.versus{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:36px}
+.versus > div{border-radius:12px;padding:18px 20px;border:1px dashed var(--line);min-width:0}
+.versus > div.zeus{border:1px solid var(--line);background:var(--surface)}
+.versus small{font:400 .72rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.versus ol{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:10px;font-size:.92rem}
+.versus ol li{background:var(--surface-2);border-radius:999px;padding:4px 12px}
+.versus ol li + li::before{content:'→';margin-right:8px;margin-left:-4px;color:var(--ink-2)}
+.versus p{margin-top:12px;font-family:var(--font-display);font-weight:650;font-size:1.15rem}
+
+/* clouds */
+.seg{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:28px}
+.seg button{font:600 .92rem var(--font-body);padding:10px 16px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.seg .hand{margin-left:10px}
+.prov{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;margin-top:18px;align-items:stretch}
+.prov > *{min-width:0}
+.rec-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.status{display:inline-block;font:600 .78rem var(--font-body);padding:3px 11px;border-radius:999px}
+.status.run{background:var(--good-soft);color:var(--good)}
+.status.todo{background:var(--warn-soft);color:var(--warn)}
+.prov-note{margin-top:12px;color:var(--ink-2);min-height:4.7em}
+.keeps{margin-top:18px;padding-top:16px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.keeps small{display:block;font:400 .72rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+.keeps li{padding-left:22px;position:relative;font-size:.95rem}
+.keeps li::before{content:'✓';position:absolute;left:0;color:var(--good);font-weight:700}
+.keeps .one li::before{content:'↻';color:var(--blue)}
+.path{display:grid;gap:8px;align-content:center}
+.node{border:1px solid var(--line);border-radius:10px;padding:11px 14px;background:var(--surface-2);font-weight:600;text-align:center}
+.node.pick{background:var(--surface);border:2px solid var(--bolt);box-shadow:var(--shadow)}
+.node small{display:block;font:400 .7rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.arrow{justify-self:center;width:2px;height:14px;background:var(--line)}
+
+/* summary */
+.sum{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:28px;margin-top:36px;align-items:start}
+.sum > *{min-width:0}
+.kv{display:grid;grid-template-columns:6.5rem minmax(0,1fr);margin-top:12px}
+.kv dt,.kv dd{padding:10px 0;border-bottom:1px solid var(--line);font-size:.92rem;min-width:0}
+.kv dt{color:var(--ink-2)}
+.opt{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+.switch input{appearance:none;-webkit-appearance:none;width:38px;height:22px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;transition:background .15s;margin:0;display:block}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .15s}
+.switch input:checked{background:var(--blue)}
+.switch input:checked::after{transform:translateX(16px)}
+.rec-head small{font:400 .72rem var(--font-mono);color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
+.rec-meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:.88rem;color:var(--ink-2)}
+.rec-meta b{color:var(--ink);font-weight:600}
+.sum-box{margin-top:14px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:14px;min-height:8.5em;font-size:.95rem}
+.sum-box small{display:block;font:400 .72rem var(--font-mono);color:var(--ink-2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+
+/* what it does: icons sit straight on the paper */
+.caps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:40px 32px;margin-top:36px}
+.caps > div{min-width:0}
+.caps > div.wide{grid-column:span 2;display:grid;grid-template-columns:150px minmax(0,1fr);gap:22px;align-items:start}
+.caps .wide > div{padding-top:28px}
+.caps .art{width:92px;margin:0 0 4px -10px}
+.caps .wide .art{width:150px;margin:0}
+.caps dt{font-family:var(--font-display);font-weight:650;font-size:1.15rem}
+.caps dd{color:var(--ink-2);margin-top:4px;font-size:.95rem}
+
+/* install */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 28px;margin-top:36px}
+.steps li{min-width:0;position:relative}
+.steps .badge{margin-left:-6px}
+.steps .badge b{font-family:var(--font-mono);font-weight:500}
+.steps li:not(:last-child)::after{content:'';position:absolute;left:66px;right:-18px;top:32px;border-top:2px dashed var(--line)}
+.steps h3{font-size:1.15rem;font-weight:650;margin-top:10px}
+.steps p{color:var(--ink-2);margin-top:6px;font-size:.95rem;max-width:34ch}
+.after{display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 18px;margin-top:32px;padding-top:20px;border-top:1px solid var(--line)}
+.after p{color:var(--ink-2);max-width:62ch}
+/* why teams want it */
+.band{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:40px;box-shadow:var(--shadow)}
+.gains{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px 36px;margin-top:32px}
+.gains li{min-width:0;border-top:2px solid var(--ink);padding-top:14px}
+.gains small{font:400 .72rem var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.gains h3{font-size:1.15rem;font-weight:650;margin-top:6px}
+.gains p{color:var(--ink-2);margin-top:6px;font-size:.95rem}
+
+/* status */
+.scope{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:36px;margin-top:28px}
+.scope h3{font-size:1.05rem;font-weight:650}
+.scope ul{margin-top:10px;display:grid;gap:10px}
+.scope li{padding-left:18px;position:relative;color:var(--ink-2);max-width:56ch}
+.scope li::before{content:"";position:absolute;left:0;top:.62em;width:8px;height:8px;border-radius:2px;background:var(--good)}
+.scope .next li::before{background:var(--warn)}
+.stack{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:32px;font-size:.9rem;color:var(--ink-2)}
+.stack span{font:400 .8rem var(--font-mono);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+
+/* close */
+.close{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px 48px;align-items:end;border-top:2px solid var(--ink);padding-top:28px}
+.close h2{margin-top:0}
+.close p{margin-top:12px;color:var(--ink-2);font-size:1.05rem;max-width:58ch}
+.sig{font-size:2.6rem;transform:rotate(-3deg);color:var(--ink);white-space:nowrap}
+footer{margin-top:56px;font-size:.85rem;color:var(--ink-2);max-width:80ch}
+
+@media (max-width:900px){
+  .hero,.builder,.prov,.sum,.scope,.versus,.who,.sec-head,.close,.steps{grid-template-columns:minmax(0,1fr)}
+  .steps li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:0 14px}
+  .steps li::after{display:none}
+  .steps .badge{grid-row:span 2;margin:0}
+  .steps h3{margin-top:8px}
+  .steps p{max-width:none}
+  .hero{gap:20px;margin-top:28px}
+  .hero-copy{padding-top:0}
+  .hero-art{width:74%}
+  .sec-head .art{order:-1;justify-self:start;max-width:220px}
+  .caps,.gains{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .band{padding:28px 22px}
+  section{margin-top:76px}
+}
+@media (max-width:560px){
+  .caps,.gains,.keeps,.two{grid-template-columns:minmax(0,1fr)}
+  .caps{gap:26px}
+  .caps > div,.caps > div.wide{grid-column:auto;display:grid;grid-template-columns:76px minmax(0,1fr);gap:0 14px;align-items:start}
+  .caps .art,.caps .wide .art{width:76px;margin:0;grid-row:span 2}
+  .caps .wide > div{padding-top:8px}
+  .caps > div:not(.wide) dt{padding-top:8px}
+  .demo-fields{grid-template-columns:6.4rem minmax(0,1fr)}
+  .sig{font-size:2.1rem}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <svg viewBox="0 0 22 28" aria-hidden="true"><polygon points="13,0 1,16 9,16 7,28 21,10 12,10" fill="var(--bolt)" stroke="var(--ink)" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <span>Zeus <span class="brand-rest">AI accelerator for Salesforce</span></span>
+    </div>
+    <nav aria-label="Sections">
+      <a href="#easy">Easy to use</a>
+      <a href="#cloud">Any cloud</a>
+      <a href="#summary">Summaries</a>
+      <a href="#what">What it does</a>
+      <a href="#install">Install</a>
+      <a href="#why">Why teams want it</a>
+      <a href="#status">Status</a>
+    </nav>
+  </div>
+
+  <header class="hero">
+    <div class="hero-copy">
+      <h1>Add AI to any Salesforce record by <span class="mark">writing a question</span>.</h1>
+      <p class="lead">Zeus reads each new record, answers the questions your team wrote in plain English, and fills in the fields about a second later. Adding a question needs no developer, and the AI provider behind it is yours to choose.</p>
+      <div class="hero-links">
+        <a class="btn" href="#easy">Try adding a question</a>
+        <a class="btn ghost" href="#why">Why teams want it</a>
+      </div>
+      <p class="byline">Designed and built by <b>Rahul Ravipudi</b>. Proof of concept, running in Salesforce sandboxes.</p>
+    </div>
+
+    <div class="stage">
+      <span class="hand" aria-hidden="true">a new Case lands…</span>
+      <span class="art hero-art"><img class="l" src="art/hero.webp" width="1200" height="700" alt="Watercolour storm cloud with a golden lightning bolt striking the record below"><img class="d" src="art/hero-dark.webp" width="1200" height="700" alt="" aria-hidden="true"></span>
+      <div class="demo" id="demo">
+        <div class="demo-tabs" id="demoTabs" role="group" aria-label="Sample records"></div>
+        <div class="demo-msg">
+          <span class="demo-from" id="demoFrom"></span>
+          <p id="demoText"></p>
+        </div>
+        <dl class="demo-fields" id="demoFields"></dl>
+        <div class="demo-foot"><span id="demoStatus"></span><span id="demoMeta"></span></div>
+      </div>
+      <p class="note">Pick a sample to replay it. The data is invented; timings and costs are typical of sandbox runs.</p>
+    </div>
+  </header>
+
+  <div class="figures">
+    <div><strong>~1 s</strong><span>from a record arriving to its fields being filled</span></div>
+    <div><strong>$0.20</strong><span>AI cost per 1,000 records classified and translated</span></div>
+    <div><strong>30 s</strong><span>for a newly saved question to go live</span></div>
+    <div><strong>0</strong><span>lines of code to add a new AI field</span></div>
+  </div>
+  <p class="note">Measured on a small demo data set in a sandbox, with a model priced at $0.20 per million input tokens and $1.20 per million output tokens.</p>
+
+  <section id="easy">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Easy to use</div>
+        <h2>If you can write the question, you can ship the feature</h2>
+        <p class="sec-lead">Nobody opens a code editor. Someone fills in a short form, and from the next record onwards Zeus answers that question and saves the answer in the field they chose.</p>
+      </div>
+      <span class="art"><img class="l" src="art/question.webp" width="640" height="460" alt="Watercolour speech bubble with a question mark, and a pencil" loading="lazy"><img class="d" src="art/question-dark.webp" width="640" height="460" alt="" aria-hidden="true" loading="lazy"></span>
+    </div>
+
+    <ul class="who">
+      <li><span class="badge"><span class="art"><img class="l" src="art/blot1.webp" width="200" height="200" alt="" loading="lazy"><img class="d" src="art/blot1-dark.webp" width="200" height="200" alt="" loading="lazy"></span><b>Ad</b></span><div><h3>Admin</h3><p>Chooses where each answer is saved and switches questions on or off.</p></div></li>
+      <li><span class="badge"><span class="art"><img class="l" src="art/blot3.webp" width="200" height="200" alt="" loading="lazy"><img class="d" src="art/blot3-dark.webp" width="200" height="200" alt="" loading="lazy"></span><b>BA</b></span><div><h3>Business analyst</h3><p>Writes and rewords the questions in plain English, then tries them on a sample.</p></div></li>
+      <li><span class="badge"><span class="art"><img class="l" src="art/blot5.webp" width="200" height="200" alt="" loading="lazy"><img class="d" src="art/blot5-dark.webp" width="200" height="200" alt="" loading="lazy"></span><b>PM</b></span><div><h3>Project manager</h3><p>Watches volume, cost and success rate on the usage dashboard.</p></div></li>
+    </ul>
+
+    <div class="builder">
+      <div class="panel">
+        <h3>New question</h3>
+        <div class="presets" id="gPresets" role="group" aria-label="Example questions"></div>
+        <div class="form">
+          <div class="fld"><span>Name</span><div id="gName"></div></div>
+          <div class="fld"><span>What do you want to know?</span><div id="gQ"></div></div>
+          <div class="two">
+            <div class="fld"><span>Answer type</span><div id="gType"></div></div>
+            <div class="fld"><span>Save answer into</span><div id="gTarget"></div></div>
+          </div>
+          <div class="add-row">
+            <button class="btn" type="button" id="gAdd">Add question</button>
+            <button class="btn ghost" type="button" id="gReset" hidden>Start over</button>
+            <span class="hand" id="gHint" aria-hidden="true">press it, then watch the record</span>
+          </div>
+        </div>
+        <p class="tally" id="gTally"></p>
+      </div>
+
+      <div>
+        <div class="demo" aria-live="polite">
+          <div class="demo-msg">
+            <span class="demo-from">Case 00001057 · sample</span>
+            <p>This is the third time this month the card reader has frozen in the middle of a sale. Order 48213 was meant to fix it and it has not. If this is not sorted by Friday we want our money back, and we will move to Northwind Pay.</p>
+          </div>
+          <dl class="demo-fields" id="gFields"></dl>
+        </div>
+        <p class="note">A guided example with four ready-made questions. In the real app you type your own, and the next record that arrives is asked it.</p>
+      </div>
+    </div>
+
+    <div class="versus">
+      <div>
+        <small>A new AI field, built the usual way</small>
+        <ol><li>Developer ticket</li><li>Code change</li><li>Review and test</li><li>Deployment</li></ol>
+        <p>Waits for the next release</p>
+      </div>
+      <div class="zeus">
+        <small>A new AI field with Zeus</small>
+        <ol><li>Fill in the form</li><li>Save</li></ol>
+        <p>Live in about 30 seconds</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="cloud">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Any cloud</div>
+        <h2>Cloud-agnostic by design</h2>
+        <p class="sec-lead">AI models and their prices change every few months. Zeus treats the provider as a setting, so a business can start on one cloud and move to another without rebuilding anything.</p>
+      </div>
+      <span class="art"><img class="l" src="art/clouds.webp" width="760" height="460" alt="Four watercolour clouds in different colours, all connected to one lightning bolt" loading="lazy"><img class="d" src="art/clouds-dark.webp" width="760" height="460" alt="" aria-hidden="true" loading="lazy"></span>
+    </div>
+
+    <div class="seg"><div class="seg" id="pSeg" role="group" aria-label="AI provider" style="margin-top:0"></div><span class="hand" aria-hidden="true">same Zeus, different cloud</span></div>
+
+    <div class="prov">
+      <div class="panel">
+        <div class="rec-head">
+          <h3 id="pTitle"></h3>
+          <span class="status" id="pStatus"></span>
+        </div>
+        <p class="prov-note" id="pNote"></p>
+        <div class="keeps">
+          <div class="one"><small>What changes</small><ul><li>One setting</li></ul></div>
+          <div><small>What stays</small><ul><li>Your questions</li><li>Your fields and reports</li><li>Your usage and cost history</li></ul></div>
+        </div>
+      </div>
+      <div class="path" aria-label="Where the request goes">
+        <div class="node">Your Salesforce records</div>
+        <div class="arrow"></div>
+        <div class="node">Zeus</div>
+        <div class="arrow"></div>
+        <div class="node pick"><small>AI provider</small><span id="pHost"></span></div>
+        <div class="arrow"></div>
+        <div class="node">Answers saved in your fields</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="summary">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Summaries</div>
+        <h2>Record summaries on demand</h2>
+        <p class="sec-lead">Choose what to read and where to save. A Get Summary button on the record page does the rest. It is the kind of summary teams often adopt Agentforce for, produced here by whichever AI provider you chose, Einstein included.</p>
+      </div>
+      <span class="art"><img class="l" src="art/summary.webp" width="700" height="460" alt="Watercolour stack of pages condensed into one short note" loading="lazy"><img class="d" src="art/summary-dark.webp" width="700" height="460" alt="" aria-hidden="true" loading="lazy"></span>
+    </div>
+
+    <div class="sum">
+      <div class="panel">
+        <h3>Summary settings for Case</h3>
+        <dl class="kv">
+          <dt>Reads</dt><dd>Subject, Description, Status, Priority</dd>
+          <dt>Saves to</dt><dd>AI Summary</dd>
+        </dl>
+        <div class="opt">
+          <label for="sEmails">Include related emails</label>
+          <span class="switch"><input type="checkbox" id="sEmails"></span>
+        </div>
+        <div class="opt">
+          <label for="sTasks">Include related tasks</label>
+          <span class="switch"><input type="checkbox" id="sTasks"></span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="rec-head">
+          <div>
+            <small>Case 00001042</small>
+            <h3>Terminal offline after update</h3>
+          </div>
+          <button class="btn" type="button" id="sBtn">Get Summary</button>
+        </div>
+        <div class="rec-meta"><span>Status <b>New</b></span><span>Priority <b>High</b></span><span>Origin <b>Web</b></span></div>
+        <div class="sum-box"><small>AI Summary</small><span id="sText"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="what">
+    <div class="eyebrow">What it does</div>
+    <h2>One accelerator, seven jobs</h2>
+    <dl class="caps">
+      <div class="wide"><span class="art"><img class="l" src="art/i-classify.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-classify-dark.webp" width="280" height="280" alt="" loading="lazy"></span><div><dt>Classify</dt><dd>Priority, sentiment, request type and product are filled in as the record arrives, along with any question you add later.</dd></div></div>
+      <div><span class="art"><img class="l" src="art/i-translate.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-translate-dark.webp" width="280" height="280" alt="" loading="lazy"></span><dt>Translate</dt><dd>Messages in other languages are translated into English beside the original, which is never overwritten.</dd></div>
+      <div><span class="art"><img class="l" src="art/i-spam.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-spam-dark.webp" width="280" height="280" alt="" loading="lazy"></span><dt>Filter spam</dt><dd>Junk is spotted first and moved to its own queue before anyone spends time on it.</dd></div>
+      <div><span class="art"><img class="l" src="art/i-summarise.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-summarise-dark.webp" width="280" height="280" alt="" loading="lazy"></span><dt>Summarise</dt><dd>One button turns a long record, with its emails and tasks, into a few sentences.</dd></div>
+      <div><span class="art"><img class="l" src="art/i-reply.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-reply-dark.webp" width="280" height="280" alt="" loading="lazy"></span><dt>Draft and send replies</dt><dd>New leads get a first reply written for their enquiry. Their answers are tracked on the lead.</dd></div>
+      <div><span class="art"><img class="l" src="art/i-queue.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-queue-dark.webp" width="280" height="280" alt="" loading="lazy"></span><dt>Roll out by team</dt><dd>Switch it on for chosen queues only, so teams can adopt it one at a time.</dd></div>
+      <div><span class="art"><img class="l" src="art/i-cost.webp" width="280" height="280" alt="" loading="lazy"><img class="d" src="art/i-cost-dark.webp" width="280" height="280" alt="" loading="lazy"></span><dt>Track usage and cost</dt><dd>A dashboard shows how often the AI ran, how well it did and what it cost.</dd></div>
+    </dl>
+  </section>
+
+  <section id="install">
+    <div class="eyebrow">Install</div>
+    <h2>Built to install like an app</h2>
+    <p class="sec-lead">Zeus is designed to ship as a Salesforce managed package. A business installs it, finishes three short setup steps, and the first record that arrives is answered. Nothing is rewritten for the new org.</p>
+    <ol class="steps">
+      <li><span class="badge"><span class="art"><img class="l" src="art/blot1.webp" width="200" height="200" alt="" loading="lazy"><img class="d" src="art/blot1-dark.webp" width="200" height="200" alt="" loading="lazy"></span><b>1</b></span><h3>Install the package</h3><p>One install adds the app, its screens and its settings to the org.</p></li>
+      <li><span class="badge"><span class="art"><img class="l" src="art/blot3.webp" width="200" height="200" alt="" loading="lazy"><img class="d" src="art/blot3-dark.webp" width="200" height="200" alt="" loading="lazy"></span><b>2</b></span><h3>Connect an AI provider</h3><p>Use the AI account the business already has, or Salesforce Einstein.</p></li>
+      <li><span class="badge"><span class="art"><img class="l" src="art/blot5.webp" width="200" height="200" alt="" loading="lazy"><img class="d" src="art/blot5-dark.webp" width="200" height="200" alt="" loading="lazy"></span><b>3</b></span><h3>Write the first question</h3><p>Pick the field for the answer. The next record that arrives gets one.</p></li>
+    </ol>
+    <div class="after">
+      <span class="hand" aria-hidden="true">working on day one</span>
+      <p>Setup is configuration, with no code to change. Improvements would reach every org as a package upgrade. Packaging is the next step: today Zeus is deployed straight into each org.</p>
+    </div>
+  </section>
+
+  <section id="why" class="band">
+    <div class="eyebrow">Why teams want it</div>
+    <h2>What it changes for a Salesforce business</h2>
+    <ul class="gains">
+      <li><small>Service teams</small><h3>A queue that arrives sorted</h3><p>Urgent cases are flagged, foreign-language cases are readable and spam is gone before an agent opens the list.</p></li>
+      <li><small>Sales and marketing</small><h3>Leads answered in moments</h3><p>Each new lead is tagged with what it is asking for and receives a relevant first reply. Responses are tracked, so nobody chases a lead that already answered.</p></li>
+      <li><small>Admins and business owners</small><h3>Change it the day you ask</h3><p>A new question or a reworded one is a form, with no development ticket and no release to wait for.</p></li>
+      <li><small>Finance and IT</small><h3>No lock-in, no surprise bills</h3><p>The cost of every AI call is visible, and the provider can be swapped when pricing or policy changes.</p></li>
+      <li><small>Consulting partners</small><h3>Configure it, don't rebuild it</h3><p>The same package is installed for each client and set up by configuration, so the second rollout is far quicker than the first.</p></li>
+      <li><small>Any department</small><h3>Built for any object</h3><p>It is designed to work on any Salesforce object. So far it has run on Cases and Leads.</p></li>
+    </ul>
+  </section>
+
+  <section id="status">
+    <div class="eyebrow">Status</div>
+    <h2>Where it stands</h2>
+    <div class="scope">
+      <div>
+        <h3>Working today</h3>
+        <ul>
+          <li>Runs end to end on AWS Bedrock and on Salesforce Einstein.</li>
+          <li>Cases and Leads: classification, translation from Spanish, French, German and Italian, spam filtering, summaries, and drafted replies with reply tracking.</li>
+          <li>An admin app for setting it up, with a usage and cost dashboard.</li>
+        </ul>
+      </div>
+      <div class="next">
+        <h3>Not done yet</h3>
+        <ul>
+          <li>Azure AI Foundry and Google Vertex AI are supported by the design but have not been run.</li>
+          <li>Not yet published as a managed package. Today it is deployed straight into each org.</li>
+          <li>Built and demonstrated in sandboxes. It has not been deployed to production.</li>
+          <li>The figures on this page come from a small demo data set.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="stack" aria-label="Built with">Built with <span>Apex</span><span>Lightning Web Components</span><span>AWS Bedrock</span><span>Salesforce Einstein</span></div>
+  </section>
+
+  <section class="close">
+    <div>
+      <h2>See it run</h2>
+      <p>The demos on this page are replicas, and the design behind them is left out on purpose. The real thing runs in a Salesforce org, and I am glad to walk through it live: add a question, create a Case, and watch the fields fill.</p>
+    </div>
+    <div class="hand sig">Rahul Ravipudi</div>
+  </section>
+
+  <footer>Every record, name and message shown on this page is invented sample data. No customer data appears here.</footer>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  function $(id){ return document.getElementById(id); }
+  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function valueNode(v){
+    var s = el('span','val');
+    if(v.skip){ s.className = 'val dim'; s.textContent = 'Skipped, it is spam'; }
+    else if(v.dim){ s.className = 'val dim'; s.textContent = v.dim; }
+    else if(v.chip){ s.appendChild(el('span','chip' + (v.tone ? ' ' + v.tone : ''), v.chip)); }
+    else { s.textContent = v.text; }
+    return s;
+  }
+
+  /* ---------- hero: sample records ---------- */
+  var SKIP = {skip:true};
+  var cases = [
+    { tab:'Outage, in Spanish', from:'Web form · new Case',
+      text:'Hola, el terminal de pago dejó de funcionar después de la última actualización. Toda la tienda está parada y perdemos ventas cada hora. Necesitamos ayuda urgente.',
+      rows:[['Spam',{chip:'No',tone:'good'}],['Language',{text:'Spanish'}],
+            ['Translation',{text:'Hello, the payment terminal stopped working after the latest update. The whole store is at a standstill and we lose sales every hour. We need urgent help.'}],
+            ['Priority',{chip:'High',tone:'bad'}],['Sentiment',{chip:'Negative',tone:'warn'}],['Case type',{chip:'Issue'}],['Product',{text:'Payment terminal'}]],
+      done:'7 fields filled', secs:'1.4', cost:'0.00023' },
+    { tab:'Question, in English', from:'Email · new Case',
+      text:'Hi, could you confirm how often the handheld scanner needs recalibrating? We have used it for two years with no problems and just want to check the recommended schedule.',
+      rows:[['Spam',{chip:'No',tone:'good'}],['Language',{text:'English'}],
+            ['Translation',{dim:'Already English, left empty'}],
+            ['Priority',{chip:'Low',tone:'good'}],['Sentiment',{chip:'Neutral'}],['Case type',{chip:'Question'}],['Product',{text:'Handheld scanner'}]],
+      done:'6 fields filled', secs:'0.9', cost:'0.00015' },
+    { tab:'Spam', from:'Web form · new Case',
+      text:'CONGRATULATIONS!!! You have been selected to receive a FREE crypto bonus of $5000. Click here now to claim your prize before it expires!',
+      rows:[['Spam',{chip:'Yes',tone:'bad'}],['Language',SKIP],['Translation',SKIP],['Priority',SKIP],['Sentiment',SKIP],['Case type',SKIP],
+            ['Moved to',{text:'Spam queue'}]],
+      done:'Spam caught, case moved', secs:'0.7', cost:'0.00009' }
+  ];
+  var demoIdx = 0, runId = 0, auto = !reduce;
+  function renderCase(i, animate){
+    var c = cases[i], my = ++runId;
+    demoIdx = i;
+    Array.prototype.forEach.call($('demoTabs').children, function(b, n){ b.setAttribute('aria-pressed', n === i ? 'true' : 'false'); });
+    $('demoFrom').textContent = c.from;
+    $('demoText').textContent = c.text;
+    var dl = $('demoFields'); dl.textContent = '';
+    var dds = [];
+    c.rows.forEach(function(r){
+      dl.appendChild(el('dt', null, r[0]));
+      var dd = el('dd', animate ? 'wait' : null);
+      dd.appendChild(el('span','ghostbar'));
+      dd.appendChild(valueNode(r[1]));
+      dl.appendChild(dd); dds.push(dd);
+    });
+    var meta = c.secs + ' s · $' + c.cost;
+    if(!animate){ $('demoStatus').textContent = c.done; $('demoMeta').textContent = meta; return; }
+    $('demoStatus').textContent = 'Reading the record…'; $('demoMeta').textContent = '';
+    dds.forEach(function(dd, n){
+      setTimeout(function(){
+        if(my !== runId) return;
+        dd.classList.remove('wait'); dd.classList.add('flash');
+        if(n === dds.length - 1){ $('demoStatus').textContent = c.done; $('demoMeta').textContent = meta; }
+      }, 700 + n * 330);
+    });
+  }
+  cases.forEach(function(c, i){
+    var b = el('button','tab', c.tab); b.type = 'button';
+    b.addEventListener('click', function(){ auto = false; renderCase(i, !reduce); });
+    $('demoTabs').appendChild(b);
+  });
+  renderCase(0, false);
+  if(!reduce){
+    setInterval(function(){ if(auto && !document.hidden) renderCase((demoIdx + 1) % cases.length, true); }, 7500);
+  }
+
+  /* ---------- guided example: add a question, see the answer on the record ---------- */
+  var base = [['Priority',{chip:'High',tone:'bad'}],['Sentiment',{chip:'Negative',tone:'warn'}]];
+  var presets = [
+    {name:'Refund requested', q:'Is the customer asking for their money back?', type:'Yes or no', target:'Refund Requested', answer:{chip:'Yes',tone:'bad'}},
+    {name:'Churn risk', q:'How likely is this customer to leave us, judging by what they say?', type:'Pick from a list: High, Medium, Low', target:'Churn Risk', answer:{chip:'High',tone:'bad'}},
+    {name:'Competitor mentioned', q:'Which competitor, if any, does the customer name?', type:'Free text', target:'Competitor Mentioned', answer:{text:'Northwind Pay'}},
+    {name:'Order number', q:'Which order number does the customer refer to?', type:'Free text', target:'Order Number', answer:{text:'48213'}}
+  ];
+  var added = [], sel = 0;
+  function isAdded(i){ return added.indexOf(i) !== -1; }
+  function renderForm(){
+    var p = presets[sel];
+    $('gName').textContent = p.name; $('gQ').textContent = p.q; $('gType').textContent = p.type; $('gTarget').textContent = p.target;
+    Array.prototype.forEach.call($('gPresets').children, function(b, n){
+      b.setAttribute('aria-pressed', n === sel ? 'true' : 'false');
+      b.classList.toggle('done', isAdded(n));
+      b.textContent = (isAdded(n) ? '✓ ' : '') + presets[n].name;
+    });
+    var all = added.length === presets.length;
+    $('gAdd').disabled = isAdded(sel);
+    $('gAdd').textContent = all ? 'All four added' : (isAdded(sel) ? 'Already added' : 'Add question');
+    $('gReset').hidden = added.length === 0;
+    $('gHint').hidden = added.length > 0;
+    var t = $('gTally'); t.textContent = '';
+    t.appendChild(el('b', null, String(base.length + added.length)));
+    t.appendChild(document.createTextNode(' questions live on Case · '));
+    t.appendChild(el('b', null, '0'));
+    t.appendChild(document.createTextNode(' lines of code written'));
+  }
+  function renderFields(freshIdx){
+    var dl = $('gFields'); dl.textContent = '';
+    base.forEach(function(r){ dl.appendChild(el('dt', null, r[0])); var dd = el('dd'); dd.appendChild(valueNode(r[1])); dl.appendChild(dd); });
+    presets.forEach(function(p, i){
+      var fresh = i === freshIdx;
+      dl.appendChild(el('dt', null, p.target));
+      var dd = el('dd', fresh && !reduce ? 'wait' : null);
+      dd.appendChild(el('span','ghostbar'));
+      var v = valueNode(isAdded(i) ? p.answer : {dim:'Not asked yet'}); dd.appendChild(v);
+      if(fresh) v.appendChild(el('span','newtag','new'));
+      dl.appendChild(dd);
+      if(fresh && !reduce) setTimeout(function(){ dd.classList.remove('wait'); dd.classList.add('flash'); }, 650);
+    });
+  }
+  presets.forEach(function(p, i){
+    var b = el('button','tab', p.name); b.type = 'button';
+    b.addEventListener('click', function(){ sel = i; renderForm(); });
+    $('gPresets').appendChild(b);
+  });
+  $('gAdd').addEventListener('click', function(){
+    if(isAdded(sel)) return;
+    var justAdded = sel;
+    added.push(sel);
+    for(var k = 0; k < presets.length; k++){ if(!isAdded(k)){ sel = k; break; } }
+    renderFields(justAdded); renderForm();
+  });
+  $('gReset').addEventListener('click', function(){ added = []; sel = 0; renderFields(-1); renderForm(); });
+  renderFields(-1); renderForm();
+
+  /* ---------- providers ---------- */
+  var provs = [
+    {name:'AWS Bedrock', run:true, note:'Run end to end. The speed and cost figures on this page were measured on Bedrock.'},
+    {name:'Salesforce Einstein', run:true, note:'Run end to end. Requests stay inside Salesforce and pass through the Einstein Trust Layer, with no outside key to manage.'},
+    {name:'Azure AI Foundry', run:false, note:'Supported by the design. It has not been run yet.'},
+    {name:'Google Vertex AI', run:false, note:'Supported by the design. It has not been run yet.'}
+  ];
+  function renderProv(i){
+    var p = provs[i];
+    Array.prototype.forEach.call($('pSeg').children, function(b, n){ b.setAttribute('aria-pressed', n === i ? 'true' : 'false'); });
+    $('pTitle').textContent = p.name;
+    var st = $('pStatus'); st.className = 'status ' + (p.run ? 'run' : 'todo');
+    st.textContent = p.run ? 'Running today' : 'Designed for, not yet run';
+    $('pNote').textContent = p.note;
+    $('pHost').textContent = p.name;
+  }
+  provs.forEach(function(p, i){
+    var b = el('button', null, p.name); b.type = 'button';
+    b.addEventListener('click', function(){ renderProv(i); });
+    $('pSeg').appendChild(b);
+  });
+  renderProv(0);
+
+  /* ---------- summary ---------- */
+  var sumRun = 0;
+  function sumText(){
+    var t = 'The customer\'s payment terminal stopped working after the latest update, so the store cannot take card payments. The case is New with High priority. Next step: assign a technician today to roll back or repair the update.';
+    if($('sEmails').checked) t += ' The email thread shows the customer has already restarted the device twice and sent a photo of the error screen.';
+    if($('sTasks').checked) t += ' One open task: a callback is booked for 2 pm.';
+    return t;
+  }
+  function showSummary(animate){
+    var my = ++sumRun, out = $('sText'), full = sumText();
+    if(!animate || reduce){ out.textContent = full; return; }
+    var words = full.split(' '), n = 0;
+    out.textContent = '';
+    (function step(){
+      if(my !== sumRun) return;
+      n = Math.min(words.length, n + 2);
+      out.textContent = words.slice(0, n).join(' ');
+      if(n < words.length) setTimeout(step, 45);
+    })();
+  }
+  $('sBtn').addEventListener('click', function(){ showSummary(true); });
+  $('sEmails').addEventListener('change', function(){ showSummary(true); });
+  $('sTasks').addEventListener('change', function(){ showSummary(true); });
+  showSummary(false);
+})();
+</script>
+
+</body></html>
