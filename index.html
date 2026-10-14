@@ -13,6 +13,9 @@
 .contact .copy:focus-visible,.contact a:focus-visible{outline:2px solid #F4B90A;outline-offset:2px}
 .contact .also{color:#B3BFD3;margin:8px 0 0}
 .contact .also a{color:#F4B90A}
+.path .hosts{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 6px;margin-top:8px}
+.path .hosts .h{font:500 .72rem var(--font-body);color:var(--ink-2);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+.path .hosts .h.dev{border-style:dashed}
 </style></head><body>
 <title>Zeus AI Accelerator</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Caveat:wght@500;600&display=swap">
@@ -430,7 +433,7 @@ footer{margin-top:56px;font-size:.85rem;color:var(--ink-2);max-width:80ch}
         <div class="arrow"></div>
         <div class="node">Zeus</div>
         <div class="arrow"></div>
-        <div class="node pick"><small>AI provider</small><span id="pHost"></span></div>
+        <div class="node pick"><small>AI provider</small><span id="pHost"></span><span class="hosts" id="pHosts"></span></div>
         <div class="arrow"></div>
         <div class="node">Answers saved in your fields</div>
       </div>
@@ -701,17 +704,22 @@ footer{margin-top:56px;font-size:.85rem;color:var(--ink-2);max-width:80ch}
   var provs = [
     {name:'AWS Bedrock', run:true, note:'Run end to end. The speed and cost figures on this page were measured on Bedrock.'},
     {name:'Salesforce Einstein', run:true, note:'Run end to end. Requests stay inside Salesforce and pass through the Einstein Trust Layer, with no outside key to manage.'},
-    {name:'Azure AI Foundry', run:false, note:'Supported by the design. It has not been run yet.'},
-    {name:'Google Vertex AI', run:false, note:'Supported by the design. It has not been run yet.'}
+    {name:'Azure AI Foundry', run:false, note:'The connector is in development. The rest of Zeus stays the same.'},
+    {name:'Google Vertex AI', run:false, note:'The connector is in development. The rest of Zeus stays the same.'}
   ];
   function renderProv(i){
     var p = provs[i];
     Array.prototype.forEach.call($('pSeg').children, function(b, n){ b.setAttribute('aria-pressed', n === i ? 'true' : 'false'); });
     $('pTitle').textContent = p.name;
     var st = $('pStatus'); st.className = 'status ' + (p.run ? 'run' : 'todo');
-    st.textContent = p.run ? 'Running today' : 'Designed for, not yet run';
+    st.textContent = p.run ? 'Running today' : 'In development';
     $('pNote').textContent = p.note;
     $('pHost').textContent = p.name;
+    var hs = $('pHosts'); hs.textContent = '';
+    provs.forEach(function(o, n){
+      if(n === i) return;
+      hs.appendChild(el('span', o.run ? 'h' : 'h dev', o.name + (o.run ? '' : ' · in development')));
+    });
   }
   provs.forEach(function(p, i){
     var b = el('button', null, p.name); b.type = 'button';
